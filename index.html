@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>Home</title>
+  </head>
+  <body>
+    <h1>Home</h1>
+    <p>Welcome to the home page.</p>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <script>
+      // Connect to the socket server
+      const socket = io("http://localhost:3000"); // Change the URL if your server is hosted elsewhere
+
+      // Event listener for connection success
+      socket.on("connect", () => {
+        console.log("Connected to socket server");
+
+        // Example: Send a message to the server
+        socket.emit("message", "Hello from indexhtml!");
+      });
+
+      // Event listener for disconnection
+      socket.on("disconnect", () => {
+        console.log("Disconnected from socket server");
+      });
+
+      // Example: Event listener for receiving messages from the server
+      socket.on("message", (data) => {
+        console.log("Message received from server:", data);
+      });
+    </script>
+  </body>
+</html>
