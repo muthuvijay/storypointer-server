@@ -45,6 +45,10 @@ io.on("connection", (socket) => {
 
   socket.on("JOIN_CHANNEL", ({ channel, name }) => {
     console.log(`User ${name} joined channel ${channel}`);
+    if (!name || !channel) {
+      console.log("No name or channel to Join");
+      return;
+    }
     // Create channel if not exists
     if (!channels.has(channel)) {
       channels.set(channel, new Set());
@@ -60,6 +64,19 @@ io.on("connection", (socket) => {
     io.emit("PARTICIPANTS", Array.from(participants.values()));
   });
 
+  socket.on("LEAVE_CHANNEL", ({ channel, name }) => {
+    console.log(`User ${name} left channel ${channel}`);
+    if (name && channel) {
+      const participants = channels.get(channel);
+      participants.delete(name);
+      channels.set(channel, participants);
+      // io.to(channel).emit("PARTICIPANTS", Array.from(participants.values()));
+      io.emit("PARTICIPANTS", Array.from(participants.values()));
+    } else {
+      console.log("No name or channel to remove");
+    }
+  });
+
   socket.on("SELECTED_QUESTIONS", ({ channel, question }) => {
     console.log(`Selected question: ${question}`);
     if (!questions.has(question)) {
@@ -72,8 +89,15 @@ io.on("connection", (socket) => {
   socket.on("VOTED_FOR_QUESTION", ({ channel, question, user, value }) => {
     console.log(`User ${user} voted ${value} for question ${question}`);
     const votes = questions.get(question);
-    votes.push({ user, value });
-    questions.set(question, votes);
+    // Check if user already voted
+    const userVoted = votes.find((vote) => vote.user === user);
+    if (userVoted) {
+      userVoted.value = value;
+    } else {
+      votes.push({ user, value });
+      questions.set(question, votes);
+    }
+
     console.log(questions);
     // io.to(channel).emit("REVEAL_VOTES", question);
     io.emit("REVEAL_VOTES", { question, votes });
