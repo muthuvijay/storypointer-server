@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "description": "Socket server that serves the story pointer",
   "main": "index.js",
+  "type": "module",
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "http": "^0.0.1-security",
+    "random-words": "^2.0.1",
     "socket.io": "^4.7.5"
   },
   "scripts": {
